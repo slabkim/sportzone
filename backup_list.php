@@ -1,5 +1,5 @@
 <?php
-require 'init.php';
+require 'config/init.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
@@ -90,7 +90,8 @@ if (preg_match('/^sportzone_backup_\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}\\.s
                     <td><?php echo htmlspecialchars($backup['name']); ?></td>
                     <td><?php echo number_format($backup['size'] / 1024, 2); ?> KB</td>
                     <td><?php echo date('Y-m-d H:i:s', $backup['mtime']); ?></td>
-                    <td><a href="backup/<?php echo htmlspecialchars($backup['name']); ?>" download>Download</a></td>
+                    <td><a href="storage/backups/<?php echo htmlspecialchars($backup['name']); ?>" download>Download</a>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

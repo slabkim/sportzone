@@ -1,5 +1,5 @@
 <?php
-require 'init.php';
+require 'config/init.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
