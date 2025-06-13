@@ -33,7 +33,7 @@ $users = $pdo->query('SELECT id, username, email, role, created_at FROM users')-
         <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
 
         <h2>Facilities</h2>
-        <a href="facilities.php">Manage Facilities</a>
+        <a href="facilities.php">Manage Facilities</a> | <a href="backup_list.php">Database Backups</a>
         <ul>
             <?php foreach ($facilities as $facility): ?>
             <li><?php echo htmlspecialchars($facility['name']); ?> -
