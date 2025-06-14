@@ -5,7 +5,7 @@ Proyek ini merupakan sistem perbankan sederhana yang dibangun menggunakan PHP da
 <h1>📌Detail Konsep</h1>
 👣Stored procedure bertindak seperti SOP internal yang menetapkan alur eksekusi berbagai operasi penting di sistem . Procedure ini disimpan langsung di lapisan database, sehingga dapat menjamin konsistensi, efisiensi, dan keamanan eksekusi, terutama dalam sistem terdistribusi atau multi-user.
 <img src="https://github.com/slabkim/sportzone/blob/main/imgAset/routine.png" >
-Beberapa procedure penting yang digunakan:
+Beberapa procedure dan function penting yang digunakan:
 
 `booking.php`
 
@@ -18,6 +18,23 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
             mysqli_stmt_execute($stmt);
             $success = "Booking successful!";
 ```
+ 📄 `App\Models\Facility.php`
+
+- **`IsFacilityAvailable(p_facility_id, p_booking_date, p_booking_time)`**  
+  Mengecek apakah suatu fasilitas tersedia pada tanggal dan waktu tertentu.  
+  Function ini mengembalikan nilai `TRUE` jika fasilitas tersedia (belum dibooking dengan status `confirmed`) dan `FALSE` jika tidak tersedia.
+
+```php
+// Memanggil fungsi IsFacilityAvailable untuk mengecek ketersediaan fasilitas
+$stmt = $this->conn->prepare("SELECT IsFacilityAvailable(?, ?, ?) AS available;");
+$stmt->execute([
+    $facilityId,
+    $bookingDate,
+    $bookingTime
+]);
+
+$result = $stmt->fetch();
+$isAvailable = $result['available'];
 
 
 `facilities.php.`
