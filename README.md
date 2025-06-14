@@ -8,6 +8,8 @@ Proyek ini merupakan sistem perbankan sederhana yang dibangun menggunakan PHP da
 Beberapa procedure penting yang digunakan:
 
 `booking.php`
+
+
 `AddBooking (p_user_id, p_facility_id, p_booking_date, p_booking_time)` : Menambahkan booking pada fasilitas.
 
 ```
@@ -15,4 +17,13 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
             mysqli_stmt_bind_param($stmt, 'iiss', $_SESSION['user_id'], $facility_id, $booking_date, $booking_time);
             mysqli_stmt_execute($stmt);
             $success = "Booking successful!";
+```
 
+
+`facilities.php.`
+
+`trg_update_facility_availability` : Trigger ini bertujuan untuk menjaga konsistensi ketersediaan fasilitas berdasarkan status booking:
+
+Jika booking dikonfirmasi, maka fasilitas terkait tidak lagi tersedia.
+
+Jika booking dibatalkan, maka fasilitas tersebut kembali tersedia.
