@@ -47,84 +47,100 @@ if ($result) {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <main class="container mx-auto flex-grow p-6 max-w-6xl bg-white rounded shadow">
-        <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        <p class="mb-6">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php" class="text-blue-600 hover:underline">Logout</a></p>
+<body class="bg-gray-50 font-sans text-gray-900 min-h-screen">
+    <main class="container mx-auto p-8 max-w-7xl bg-white rounded-lg shadow-2xl mt-10 overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-4xl font-extrabold text-indigo-600">Admin Dashboard</h1>
+            <p class="text-lg font-medium">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
+                <a href="logout.php" class="text-blue-500 hover:text-blue-600">Logout</a>
+            </p>
+        </div>
 
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Facilities</h2>
-            <a href="facilities.php" class="inline-block mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Manage Facilities</a>
-            <a href="backup_list.php" class="inline-block mb-4 ml-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Database Backups</a>
-            <table class="w-full border border-gray-300 border-collapse">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border border-gray-300 px-4 py-2 text-left">Name</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Price</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Availability</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($facilities as $facility): ?>
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo htmlspecialchars($facility['name']); ?></td>
-                        <td class="border border-gray-300 px-4 py-2">$<?php echo number_format($facility['price'], 2); ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $facility['available'] ? 'Available' : 'Not Available'; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <!-- Facilities Section -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Facilities</h2>
+            <div class="flex space-x-4 mb-4">
+                <a href="facilities.php" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Manage Facilities</a>
+                <a href="backup_list.php" class="inline-block px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Database Backups</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse bg-gray-100 rounded-lg shadow-md">
+                    <thead class="bg-indigo-600 text-white">
+                        <tr>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Price</th>
+                            <th class="px-4 py-2">Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($facilities as $facility): ?>
+                        <tr class="hover:bg-gray-200">
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($facility['name']); ?></td>
+                            <td class="px-4 py-2">$<?php echo number_format($facility['price'], 2); ?></td>
+                            <td class="px-4 py-2"><?php echo $facility['available'] ? 'Available' : 'Not Available'; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Bookings</h2>
-            <table class="w-full border border-gray-300 border-collapse">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border border-gray-300 px-4 py-2 text-left">User</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Facility</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Time</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($bookings as $booking): ?>
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo htmlspecialchars($booking['username']); ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo htmlspecialchars($booking['facility_name']); ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $booking['booking_date']; ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $booking['booking_time']; ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $booking['status']; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <!-- Bookings Section -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Bookings</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse bg-gray-100 rounded-lg shadow-md">
+                    <thead class="bg-indigo-600 text-white">
+                        <tr>
+                            <th class="px-4 py-2">User</th>
+                            <th class="px-4 py-2">Facility</th>
+                            <th class="px-4 py-2">Date</th>
+                            <th class="px-4 py-2">Time</th>
+                            <th class="px-4 py-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($bookings as $booking): ?>
+                        <tr class="hover:bg-gray-200">
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($booking['username']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($booking['facility_name']); ?></td>
+                            <td class="px-4 py-2"><?php echo $booking['booking_date']; ?></td>
+                            <td class="px-4 py-2"><?php echo $booking['booking_time']; ?></td>
+                            <td class="px-4 py-2"><?php echo $booking['status']; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-semibold mb-4">Users</h2>
-            <table class="w-full border border-gray-300 border-collapse">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border border-gray-300 px-4 py-2 text-left">Username</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Role</th>
-                        <th class="border border-gray-300 px-4 py-2 text-left">Registered</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo htmlspecialchars($user['username']); ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo htmlspecialchars($user['email']); ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $user['role']; ?></td>
-                        <td class="border border-gray-300 px-4 py-2"><?php echo $user['created_at']; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <!-- Users Section -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Users</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse bg-gray-100 rounded-lg shadow-md">
+                    <thead class="bg-indigo-600 text-white">
+                        <tr>
+                            <th class="px-4 py-2">Username</th>
+                            <th class="px-4 py-2">Email</th>
+                            <th class="px-4 py-2">Role</th>
+                            <th class="px-4 py-2">Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $user): ?>
+                        <tr class="hover:bg-gray-200">
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($user['username']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($user['email']); ?></td>
+                            <td class="px-4 py-2"><?php echo $user['role']; ?></td>
+                            <td class="px-4 py-2"><?php echo $user['created_at']; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </section>
+
     </main>
 </body>
 
