@@ -52,3 +52,27 @@ BEGIN
     END IF;
 END
 ```
+
+## 💾 Backup Otomatis
+
+Untuk menjaga ketersediaan dan keamanan data, sistem ini dilengkapi fitur backup otomatis menggunakan `mysqldump` dan *task scheduler*. Backup dilakukan secara berkala dan disimpan dengan nama file yang mencakup *timestamp*, sehingga mudah ditelusuri. Semua file hasil backup akan disimpan di direktori `storage/backups`.
+
+---
+
+### 📄 backup.php
+
+```php
+<?php
+require_once __DIR__ . '/init.php';
+
+$date = date('Y-m-d_H-i-s');
+$backupFile = __DIR__ . "/storage/backups/pdtbank_backup_$date.sql";
+
+// Perintah mysqldump
+$command = "\"C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin\\mysqldump.exe\" " .
+           "-u " . DB_USER . " " .
+           "-p" . DB_PASSWORD . " " .
+           DB_NAME . " > \"$backupFile\"";
+
+// Eksekusi perintah
+exec($command);
