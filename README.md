@@ -37,7 +37,7 @@ $stmt->execute([
 
 $result = $stmt->fetch();
 $isAvailable = $result['available'];
-
+```
 `trg_update_facility_availability` : Trigger ini bertujuan untuk menjaga konsistensi ketersediaan fasilitas berdasarkan status booking:
 - Jika booking dikonfirmasi, maka fasilitas terkait tidak lagi tersedia.
 - Jika booking dibatalkan, maka fasilitas tersebut kembali tersedia.
