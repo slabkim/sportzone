@@ -23,7 +23,16 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
 `facilities.php.`
 
 `trg_update_facility_availability` : Trigger ini bertujuan untuk menjaga konsistensi ketersediaan fasilitas berdasarkan status booking:
+1.Jika booking dikonfirmasi, maka fasilitas terkait tidak lagi tersedia.
+2.Jika booking dibatalkan, maka fasilitas tersebut kembali tersedia.
 
-Jika booking dikonfirmasi, maka fasilitas terkait tidak lagi tersedia.
 
-Jika booking dibatalkan, maka fasilitas tersebut kembali tersedia.
+``` 
+BEGIN
+    IF NEW.status = 'confirmed' THEN
+        UPDATE facilities SET available = FALSE WHERE id = NEW.facility_id;
+    ELSEIF NEW.status = 'cancelled' THEN
+        UPDATE facilities SET available = TRUE WHERE id = NEW.facility_id;
+    END IF;
+END
+```
