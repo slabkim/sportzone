@@ -19,30 +19,14 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
             $success = "Booking successful!";
 ```
  
-- **`IsFacilityAvailable(p_facility_id, p_booking_date, p_booking_time)`**  
-  Mengecek apakah suatu fasilitas tersedia pada tanggal dan waktu tertentu.  
-  Function ini mengembalikan nilai `TRUE` jika fasilitas tersedia (belum dibooking dengan status `confirmed`) dan `FALSE` jika tidak tersedia.
-
-```php
-// Memanggil fungsi IsFacilityAvailable untuk mengecek ketersediaan fasilitas
-$stmt = $this->conn->prepare("SELECT IsFacilityAvailable(?, ?, ?) AS available;");
-$stmt->execute([
-    $facilityId,
-    $bookingDate,
-    $bookingTime
-]);
-
-$result = $stmt->fetch();
-$isAvailable = $result['available'];
-
 
 `facilities.php.`
 
-- **`IsFacilityAvailable(p_facility_id, p_booking_date, p_booking_time)`**  
+`IsFacilityAvailable(p_facility_id, p_booking_date, p_booking_time)`
   Mengecek apakah suatu fasilitas tersedia pada tanggal dan waktu tertentu.  
   Function ini mengembalikan nilai `TRUE` jika fasilitas tersedia (belum dibooking dengan status `confirmed`) dan `FALSE` jika tidak tersedia.
 
-```php
+```
 // Memanggil fungsi IsFacilityAvailable untuk mengecek ketersediaan fasilitas
 $stmt = $this->conn->prepare("SELECT IsFacilityAvailable(?, ?, ?) AS available;");
 $stmt->execute([
@@ -57,7 +41,6 @@ $isAvailable = $result['available'];
 `trg_update_facility_availability` : Trigger ini bertujuan untuk menjaga konsistensi ketersediaan fasilitas berdasarkan status booking:
 - Jika booking dikonfirmasi, maka fasilitas terkait tidak lagi tersedia.
 - Jika booking dibatalkan, maka fasilitas tersebut kembali tersedia.
-
 
 ``` 
 BEGIN
