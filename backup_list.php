@@ -1,4 +1,5 @@
 <?php
+session_start();
 require 'config/init.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {

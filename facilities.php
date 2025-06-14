@@ -1,4 +1,5 @@
 <?php
+session_start();
 require 'config/init.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -20,8 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'add') {
         if ($name && $price) {
-            $stmt = $pdo->prepare('INSERT INTO facilities (name, description, price, available) VALUES (?, ?, ?, ?)');
-            if ($stmt->execute([$name, $description, $price, $available])) {
+            $stmt = mysqli_prepare($conn, 'INSERT INTO facilities (name, description, price, available) VALUES (?, ?, ?, ?)');
+            mysqli_stmt_bind_param($stmt, 'ssdi', $name, $description, $price, $available);
+            if (mysqli_stmt_execute($stmt)) {
                 $success = 'Facility added successfully.';
             } else {
                 $error = 'Failed to add facility.';
@@ -30,15 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Name and price are required.';
         }
     } elseif ($action === 'edit' && $id) {
-        $stmt = $pdo->prepare('UPDATE facilities SET name = ?, description = ?, price = ?, available = ? WHERE id = ?');
-        if ($stmt->execute([$name, $description, $price, $available, $id])) {
+        $stmt = mysqli_prepare($conn, 'UPDATE facilities SET name = ?, description = ?, price = ?, available = ? WHERE id = ?');
+        mysqli_stmt_bind_param($stmt, 'ssdii', $name, $description, $price, $available, $id);
+        if (mysqli_stmt_execute($stmt)) {
             $success = 'Facility updated successfully.';
         } else {
             $error = 'Failed to update facility.';
         }
     } elseif ($action === 'delete' && $id) {
-        $stmt = $pdo->prepare('DELETE FROM facilities WHERE id = ?');
-        if ($stmt->execute([$id])) {
+        $stmt = mysqli_prepare($conn, 'DELETE FROM facilities WHERE id = ?');
+        mysqli_stmt_bind_param($stmt, 'i', $id);
+        if (mysqli_stmt_execute($stmt)) {
             $success = 'Facility deleted successfully.';
         } else {
             $error = 'Failed to delete facility.';
@@ -47,7 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch all facilities
-$facilities = $pdo->query('SELECT * FROM facilities')->fetchAll();
+$facilities = [];
+$result = mysqli_query($conn, 'SELECT * FROM facilities');
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $facilities[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>

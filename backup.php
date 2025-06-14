@@ -5,7 +5,10 @@ error_reporting(E_ALL);
 
 echo "Debug: backup.php script started.<br>";
 
-require_once __DIR__ . '/init.php';
+date_default_timezone_set('Asia/Jakarta');
+
+require_once __DIR__ . '/config/init.php';
+session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require 'config/init.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -13,9 +14,11 @@ if (!$booking_id) {
 }
 
 // Fetch booking details
-$stmt = $pdo->prepare('SELECT b.*, f.price FROM bookings b JOIN facilities f ON b.facility_id = f.id WHERE b.id = ? AND b.user_id = ?');
-$stmt->execute([$booking_id, $_SESSION['user_id']]);
-$booking = $stmt->fetch();
+$stmt = mysqli_prepare($conn, 'SELECT b.*, f.price FROM bookings b JOIN facilities f ON b.facility_id = f.id WHERE b.id = ? AND b.user_id = ?');
+mysqli_stmt_bind_param($stmt, 'ii', $booking_id, $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$booking = mysqli_fetch_assoc($result);
 
 if (!$booking) {
     echo "Booking not found.";
@@ -24,14 +27,17 @@ if (!$booking) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // For simplicity, we mock payment success
-    $stmt = $pdo->prepare('INSERT INTO payments (booking_id, amount, status) VALUES (?, ?, ?)');
-    if ($stmt->execute([$booking_id, $booking['price'], 'completed'])) {
+    $stmt = mysqli_prepare($conn, 'INSERT INTO payments (booking_id, amount, status) VALUES (?, ?, ?)');
+    $amount = $booking['price'];
+    $status = 'completed';
+    mysqli_stmt_bind_param($stmt, 'ids', $booking_id, $amount, $status);
+    if (mysqli_stmt_execute($stmt)) {
         // Update booking status to confirmed
-        $stmt = $pdo->prepare('UPDATE bookings SET status = ? WHERE id = ?');
-        $stmt->execute(['confirmed', $booking_id]);
-        echo "Payment successful! Your booking is confirmed.";
-        echo '<br><a href="history.php">View Booking History</a>';
-        exit;
+        $stmt = mysqli_prepare($conn, 'UPDATE bookings SET status = ? WHERE id = ?');
+        $confirmed = 'confirmed';
+        mysqli_stmt_bind_param($stmt, 'si', $confirmed, $booking_id);
+        mysqli_stmt_execute($stmt);
+        $success = "Payment successful! Your booking is confirmed.";
     } else {
         $error = "Payment failed. Please try again.";
     }
@@ -56,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="post" action="payment.php?booking_id=<?php echo $booking_id; ?>">
             <button type="submit">Pay Now</button>
         </form>
+        <?php if (!empty($success)): ?>
+        <p class="success"><?php echo htmlspecialchars($success); ?></p>
+        <p><a href="history.php">View Booking History</a></p>
+        <?php else: ?>
         <p><a href="history.php">Back to Booking History</a></p>
+        <?php endif; ?>
     </div>
 </body>
 
