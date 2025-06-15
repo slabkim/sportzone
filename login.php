@@ -6,27 +6,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if ($username && $password) {
-        try {
-            $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
+$stmt = mysqli_prepare($conn, 'SELECT * FROM users WHERE username = ?');
+mysqli_stmt_bind_param($stmt, 's', $username);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
 
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                if ($user['role'] === 'admin') {
-                    header('Location: admin.php');
-                } else {
-                    header('Location: home.php');
-                }
-                exit;
-            } else {
-                $error = 'Invalid username or password';
-            }
-        } catch (PDOException $e) {
-            $error = 'Database error: ' . $e->getMessage();
-        }
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role'] = $user['role'];
+    if ($user['role'] === 'admin') {
+        header('Location: admin.php');
+    } else {
+        header('Location: home.php');
+    }
+    exit;
+} else {
+    $error = 'Invalid username or password';
+}
     } else {
         $error = 'Please enter username and password';
     }

@@ -8,12 +8,12 @@ if (!isset($_SESSION['user_id'])) {
 
 // Fetch available facilities
 $facilities = [];
-try {
-    $stmt = $pdo->query('SELECT * FROM facilities WHERE available = TRUE');
-    $facilities = $stmt->fetchAll();
-} catch (PDOException $e) {
-    // Handle query error, optionally log or display error message
-    $facilities = [];
+$facilities = [];
+$result = mysqli_query($conn, 'SELECT * FROM facilities WHERE available = TRUE');
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $facilities[] = $row;
+    }
 }
 ?>
 
