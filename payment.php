@@ -13,34 +13,43 @@ if (!$booking_id) {
     exit;
 }
 
-try {
-    // Fetch booking details
-    $stmt = $pdo->prepare('SELECT b.*, f.price FROM bookings b JOIN facilities f ON b.facility_id = f.id WHERE b.id = ? AND b.user_id = ?');
-    $stmt->execute([$booking_id, $_SESSION['user_id']]);
-    $booking = $stmt->fetch();
+$booking_id = $_GET['booking_id'] ?? null;
+if (!$booking_id) {
+    header('Location: history.php');
+    exit;
+}
 
-    if (!$booking) {
-        echo "Booking not found.";
-        exit;
-    }
+$booking = null;
+$error = '';
+$success = '';
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // For simplicity, we mock payment success
-        $stmt = $pdo->prepare('INSERT INTO payments (booking_id, amount, status) VALUES (?, ?, ?)');
-        $amount = $booking['price'];
-        $status = 'completed';
-        if ($stmt->execute([$booking_id, $amount, $status])) {
-            // Update booking status to confirmed
-            $stmt = $pdo->prepare('UPDATE bookings SET status = ? WHERE id = ?');
-            $confirmed = 'confirmed';
-            $stmt->execute([$confirmed, $booking_id]);
-            $success = "Payment successful! Your booking is confirmed.";
-        } else {
-            $error = "Payment failed. Please try again.";
-        }
+$stmt = mysqli_prepare($conn, 'SELECT b.*, f.price FROM bookings b JOIN facilities f ON b.facility_id = f.id WHERE b.id = ? AND b.user_id = ?');
+mysqli_stmt_bind_param($stmt, 'ii', $booking_id, $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+if ($result) {
+    $booking = mysqli_fetch_assoc($result);
+}
+
+if (!$booking) {
+    echo "Booking not found.";
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $stmt = mysqli_prepare($conn, 'INSERT INTO payments (booking_id, amount, status) VALUES (?, ?, ?)');
+    $amount = $booking['price'];
+    $status = 'completed';
+    mysqli_stmt_bind_param($stmt, 'ids', $booking_id, $amount, $status);
+    if (mysqli_stmt_execute($stmt)) {
+        $stmt = mysqli_prepare($conn, 'UPDATE bookings SET status = ? WHERE id = ?');
+        $confirmed = 'confirmed';
+        mysqli_stmt_bind_param($stmt, 'si', $confirmed, $booking_id);
+        mysqli_stmt_execute($stmt);
+        $success = "Payment successful! Your booking is confirmed.";
+    } else {
+        $error = "Payment failed. Please try again.";
     }
-} catch (PDOException $e) {
-    die("Database query error: " . $e->getMessage());
 }
 ?>
 

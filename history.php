@@ -7,17 +7,20 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-try {
-    $stmt = $pdo->prepare('SELECT b.id, f.name AS facility_name, b.booking_date, b.booking_time, b.status AS booking_status, p.status AS payment_status
+$bookings = [];
+$stmt = mysqli_prepare($conn, 'SELECT b.id, f.name AS facility_name, b.booking_date, b.booking_time, b.status AS booking_status, p.status AS payment_status
                        FROM bookings b
                        JOIN facilities f ON b.facility_id = f.id
                        LEFT JOIN payments p ON b.id = p.booking_id
                        WHERE b.user_id = ?
                        ORDER BY b.booking_date DESC, b.booking_time DESC');
-    $stmt->execute([$_SESSION['user_id']]);
-    $bookings = $stmt->fetchAll();
-} catch (PDOException $e) {
-    die("Database query error: " . $e->getMessage());
+mysqli_stmt_bind_param($stmt, 'i', $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $bookings[] = $row;
+    }
 }
 ?>
 

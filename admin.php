@@ -7,25 +7,35 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-try {
-    // Fetch all facilities
-    $stmt = $pdo->query('SELECT * FROM facilities');
-    $facilities = $stmt->fetchAll();
+// Fetch all facilities
+$facilities = [];
+$result = mysqli_query($conn, 'SELECT * FROM facilities');
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $facilities[] = $row;
+    }
+}
 
-    // Fetch all bookings
-    $query = 'SELECT b.id, u.username, f.name AS facility_name, b.booking_date, b.booking_time, b.status
-              FROM bookings b
-              JOIN users u ON b.user_id = u.id
-              JOIN facilities f ON b.facility_id = f.id';
-    $stmt = $pdo->query($query);
-    $bookings = $stmt->fetchAll();
+// Fetch all bookings
+$bookings = [];
+$query = 'SELECT b.id, u.username, f.name AS facility_name, b.booking_date, b.booking_time, b.status
+          FROM bookings b
+          JOIN users u ON b.user_id = u.id
+          JOIN facilities f ON b.facility_id = f.id';
+$result = mysqli_query($conn, $query);
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $bookings[] = $row;
+    }
+}
 
-    // Fetch all users
-    $stmt = $pdo->query('SELECT id, username, email, role, created_at FROM users');
-    $users = $stmt->fetchAll();
-} catch (PDOException $e) {
-    // Handle query error
-    die("Database query error: " . $e->getMessage());
+// Fetch all users
+$users = [];
+$result = mysqli_query($conn, 'SELECT id, username, email, role, created_at FROM users');
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $users[] = $row;
+    }
 }
 ?>
 

@@ -13,49 +13,55 @@ $success = '';
 $error = '';
 $success = '';
 
-try {
-    // Handle add, edit, delete actions
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $action = $_POST['action'] ?? '';
-        $name = $_POST['name'] ?? '';
-        $description = $_POST['description'] ?? '';
-        $price = $_POST['price'] ?? 0;
-        $available = isset($_POST['available']) ? 1 : 0;
-        $id = $_POST['id'] ?? null;
+$error = '';
+$success = '';
 
-        if ($action === 'add') {
-            if ($name && $price) {
-                $stmt = $pdo->prepare('INSERT INTO facilities (name, description, price, available) VALUES (?, ?, ?, ?)');
-                if ($stmt->execute([$name, $description, $price, $available])) {
-                    $success = 'Facility added successfully.';
-                } else {
-                    $error = 'Failed to add facility.';
-                }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    $name = $_POST['name'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $price = $_POST['price'] ?? 0;
+    $available = isset($_POST['available']) ? 1 : 0;
+    $id = $_POST['id'] ?? null;
+
+    if ($action === 'add') {
+        if ($name && $price) {
+            $stmt = mysqli_prepare($conn, 'INSERT INTO facilities (name, description, price, available) VALUES (?, ?, ?, ?)');
+            mysqli_stmt_bind_param($stmt, 'ssdi', $name, $description, $price, $available);
+            if (mysqli_stmt_execute($stmt)) {
+                $success = 'Facility added successfully.';
             } else {
-                $error = 'Name and price are required.';
+                $error = 'Failed to add facility.';
             }
-        } elseif ($action === 'edit' && $id) {
-            $stmt = $pdo->prepare('UPDATE facilities SET name = ?, description = ?, price = ?, available = ? WHERE id = ?');
-            if ($stmt->execute([$name, $description, $price, $available, $id])) {
-                $success = 'Facility updated successfully.';
-            } else {
-                $error = 'Failed to update facility.';
-            }
-        } elseif ($action === 'delete' && $id) {
-            $stmt = $pdo->prepare('DELETE FROM facilities WHERE id = ?');
-            if ($stmt->execute([$id])) {
-                $success = 'Facility deleted successfully.';
-            } else {
-                $error = 'Failed to delete facility.';
-            }
+        } else {
+            $error = 'Name and price are required.';
+        }
+    } elseif ($action === 'edit' && $id) {
+        $stmt = mysqli_prepare($conn, 'UPDATE facilities SET name = ?, description = ?, price = ?, available = ? WHERE id = ?');
+        mysqli_stmt_bind_param($stmt, 'ssdii', $name, $description, $price, $available, $id);
+        if (mysqli_stmt_execute($stmt)) {
+            $success = 'Facility updated successfully.';
+        } else {
+            $error = 'Failed to update facility.';
+        }
+    } elseif ($action === 'delete' && $id) {
+        $stmt = mysqli_prepare($conn, 'DELETE FROM facilities WHERE id = ?');
+        mysqli_stmt_bind_param($stmt, 'i', $id);
+        if (mysqli_stmt_execute($stmt)) {
+            $success = 'Facility deleted successfully.';
+        } else {
+            $error = 'Failed to delete facility.';
         }
     }
+}
 
-    // Fetch all facilities
-    $stmt = $pdo->query('SELECT * FROM facilities');
-    $facilities = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $error = "Database error: " . $e->getMessage();
+// Fetch all facilities
+$facilities = [];
+$result = mysqli_query($conn, 'SELECT * FROM facilities');
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $facilities[] = $row;
+    }
 }
 ?>
 
