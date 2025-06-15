@@ -50,7 +50,3 @@ Berikut langkah-langkah untuk menjadwalkan backup otomatis setiap 5 menit menggu
    - Anda dapat memeriksa hasil backup di folder `storage/backups` pada proyek SportZone.
 
 ---
-
-Pastikan path PHP dan backup.php sesuai dengan lingkungan Anda.
-
-Jika Anda membutuhkan bantuan lebih lanjut untuk konfigurasi atau troubleshooting, silakan hubungi saya.
