@@ -1,5 +1,4 @@
 <?php
-session_start();
 require 'config/init.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -9,11 +8,12 @@ if (!isset($_SESSION['user_id'])) {
 
 // Fetch available facilities
 $facilities = [];
-$result = mysqli_query($conn, 'SELECT * FROM facilities WHERE available = TRUE');
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $facilities[] = $row;
-    }
+try {
+    $stmt = $pdo->query('SELECT * FROM facilities WHERE available = TRUE');
+    $facilities = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // Handle query error, optionally log or display error message
+    $facilities = [];
 }
 ?>
 
@@ -31,7 +31,8 @@ if ($result) {
     <?php include 'navbar.php'; ?>
 
     <main class="container mx-auto flex-grow p-6">
-        <h1 class="text-3xl font-bold mb-4">Welcome to SportZone, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
+        <h1 class="text-3xl font-bold mb-4">Welcome to SportZone,
+            <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
         <div class="mb-6">
             <a href="history.php" class="text-blue-600 hover:underline mr-4">Booking History</a>
             <a href="logout.php" class="text-blue-600 hover:underline">Logout</a>
@@ -46,7 +47,8 @@ if ($result) {
                     <h3 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($facility['name']); ?></h3>
                     <p class="mb-2"><?php echo htmlspecialchars($facility['description']); ?></p>
                     <p class="mb-4 font-semibold">Price: $<?php echo number_format($facility['price'], 2); ?></p>
-                    <a href="booking.php?facility_id=<?php echo $facility['id']; ?>" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Book Now</a>
+                    <a href="booking.php?facility_id=<?php echo $facility['id']; ?>"
+                        class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Book Now</a>
                 </li>
                 <?php endforeach; ?>
             </ul>

@@ -1,7 +1,9 @@
 <?php
 // init.php - Database connection and session start
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $host = 'localhost';
 $db   = 'sportzone';

@@ -7,35 +7,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// Fetch all facilities
-$facilities = [];
-$result = mysqli_query($conn, 'SELECT * FROM facilities');
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $facilities[] = $row;
-    }
-}
+try {
+    // Fetch all facilities
+    $stmt = $pdo->query('SELECT * FROM facilities');
+    $facilities = $stmt->fetchAll();
 
-// Fetch all bookings
-$bookings = [];
-$query = 'SELECT b.id, u.username, f.name AS facility_name, b.booking_date, b.booking_time, b.status
-          FROM bookings b
-          JOIN users u ON b.user_id = u.id
-          JOIN facilities f ON b.facility_id = f.id';
-$result = mysqli_query($conn, $query);
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $bookings[] = $row;
-    }
-}
+    // Fetch all bookings
+    $query = 'SELECT b.id, u.username, f.name AS facility_name, b.booking_date, b.booking_time, b.status
+              FROM bookings b
+              JOIN users u ON b.user_id = u.id
+              JOIN facilities f ON b.facility_id = f.id';
+    $stmt = $pdo->query($query);
+    $bookings = $stmt->fetchAll();
 
-// Fetch all users
-$users = [];
-$result = mysqli_query($conn, 'SELECT id, username, email, role, created_at FROM users');
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $users[] = $row;
-    }
+    // Fetch all users
+    $stmt = $pdo->query('SELECT id, username, email, role, created_at FROM users');
+    $users = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // Handle query error
+    die("Database query error: " . $e->getMessage());
 }
 ?>
 
@@ -51,7 +41,7 @@ if ($result) {
     <main class="container mx-auto p-8 max-w-7xl bg-white rounded-lg shadow-2xl mt-10 overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-4xl font-extrabold text-indigo-600">Admin Dashboard</h1>
-            <p class="text-lg font-medium">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | 
+            <p class="text-lg font-medium">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> |
                 <a href="logout.php" class="text-blue-500 hover:text-blue-600">Logout</a>
             </p>
         </div>
@@ -60,8 +50,12 @@ if ($result) {
         <section class="bg-white p-6 rounded-xl shadow-lg mb-6">
             <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Facilities</h2>
             <div class="flex space-x-4 mb-4">
-                <a href="facilities.php" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Manage Facilities</a>
-                <a href="backup_list.php" class="inline-block px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Database Backups</a>
+                <a href="facilities.php"
+                    class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Manage
+                    Facilities</a>
+                <a href="backup_list.php"
+                    class="inline-block px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Database
+                    Backups</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full table-auto border-collapse bg-gray-100 rounded-lg shadow-md">
@@ -77,7 +71,8 @@ if ($result) {
                         <tr class="hover:bg-gray-200">
                             <td class="px-4 py-2"><?php echo htmlspecialchars($facility['name']); ?></td>
                             <td class="px-4 py-2">$<?php echo number_format($facility['price'], 2); ?></td>
-                            <td class="px-4 py-2"><?php echo $facility['available'] ? 'Available' : 'Not Available'; ?></td>
+                            <td class="px-4 py-2"><?php echo $facility['available'] ? 'Available' : 'Not Available'; ?>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
