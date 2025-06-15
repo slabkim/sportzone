@@ -27,12 +27,11 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
 
 ```
 // Memanggil fungsi IsFacilityAvailable untuk mengecek ketersediaan fasilitas
-$stmt = $this->conn->prepare("SELECT IsFacilityAvailable(?, ?, ?) AS available;");
-$stmt->execute([
-    $facilityId,
-    $bookingDate,
-    $bookingTime
-]);
+$stmt = mysqli_prepare($conn, 'SELECT IsFacilityAvailable(?, ?, ?) AS available');
+        mysqli_stmt_bind_param($stmt, 'iss', $facility_id, $booking_date, $booking_time);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($result);
 
 $result = $stmt->fetch();
 $isAvailable = $result['available'];
