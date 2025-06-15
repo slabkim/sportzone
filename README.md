@@ -21,8 +21,6 @@ $stmt = mysqli_prepare($conn, 'CALL AddBooking(?, ?, ?, ?)');
 ```
  
 
-`facilities.php.`
-
 `IsFacilityAvailable(p_facility_id, p_booking_date, p_booking_time)`
   Mengecek apakah suatu fasilitas tersedia pada tanggal dan waktu tertentu.  
   Function ini mengembalikan nilai `TRUE` jika fasilitas tersedia (belum dibooking dengan status `confirmed`) dan `FALSE` jika tidak tersedia.
